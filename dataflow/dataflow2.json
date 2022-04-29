@@ -59,7 +59,7 @@
 				"     firstRowAsHeader: true) ~> source1",
 				"source1 derive({joined date validation} = between(toDate({joined date}), currentDate() -1000, currentDate() + 20)) ~> derivedColumn1",
 				"derivedColumn1 aggregate(groupBy(EmployeeID),",
-				"     {joined date validation} = true()) ~> aggregate1",
+				"     EmployeeID = true()) ~> aggregate1",
 				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
