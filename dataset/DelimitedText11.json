@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "copydata_error.txt",
-				"container": "adf"
+				"fileName": "abc.csv",
+				"container": "newdata"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
