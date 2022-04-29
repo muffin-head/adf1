@@ -1,0 +1,182 @@
+{
+	"name": "DuplicateEMPrecordsentinaNewFilehavingdifferenttimestamp",
+	"properties": {
+		"description": "Task 3 Duplicate EMP record sent in a New File having different time stamp https://github.com/AzureDataAnalytics/ETL/wiki/Processing-BusinessRules-rules-thru-ADF-on-Insert-Update-Delete",
+		"folder": {
+			"name": "duplidacte re cords dataflows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "aggregate2"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "select3"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as short,",
+				"          CashCentreID as integer,",
+				"          CashCentreShiftID as integer,",
+				"          CashCentreTeamID as long,",
+				"          PayRollNumber as long,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          CreatedBy as string,",
+				"          CreatedOn as string,",
+				"          UpdatedBy as string,",
+				"          UpdatedOn as string,",
+				"          DeletedBy as string,",
+				"          DeletedOn as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'adf',",
+				"     fileName: 'record.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source1",
+				"source(output(",
+				"          EmployeeID as short,",
+				"          CashCentreID as integer,",
+				"          CashCentreShiftID as integer,",
+				"          CashCentreTeamID as long,",
+				"          PayRollNumber as long,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          CreatedBy as string,",
+				"          CreatedOn as string,",
+				"          UpdatedBy as string,",
+				"          UpdatedOn as string,",
+				"          DeletedBy as string,",
+				"          DeletedOn as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: true,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'adf',",
+				"     fileName: 'dup_rec.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source2",
+				"source1, source2 join(source1@EmployeeID == source2@EmployeeID,",
+				"     joinType:'left',",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          EmployeeID = source1@EmployeeID,",
+				"          CashCentreID = source1@CashCentreID,",
+				"          CashCentreShiftID = source1@CashCentreShiftID,",
+				"          CashCentreTeamID = source1@CashCentreTeamID,",
+				"          PayRollNumber = source1@PayRollNumber,",
+				"          FirstName = source1@FirstName,",
+				"          LastName = source1@LastName,",
+				"          DisplayName = source1@DisplayName,",
+				"          CreatedBy = source1@CreatedBy,",
+				"          CreatedOn = source1@CreatedOn,",
+				"          UpdatedBy = source1@UpdatedBy,",
+				"          UpdatedOn = source1@UpdatedOn,",
+				"          DeletedBy = source1@DeletedBy,",
+				"          DeletedOn = source1@DeletedOn,",
+				"          RowLockVersion = source1@RowLockVersion,",
+				"          IsActive = source1@IsActive,",
+				"          tempEmployeeID = source2@EmployeeID,",
+				"          tempCashCentreID = source2@CashCentreID,",
+				"          tempCashCentreShiftID = source2@CashCentreShiftID,",
+				"          tempCashCentreTeamID = source2@CashCentreTeamID,",
+				"          tempPayRollNumber = source2@PayRollNumber,",
+				"          tempFirstName = source2@FirstName,",
+				"          tempLastName = source2@LastName,",
+				"          tempDisplayName = source2@DisplayName,",
+				"          tempCreatedBy = source2@CreatedBy,",
+				"          tempCreatedOn = source2@CreatedOn,",
+				"          tempUpdatedBy = source2@UpdatedBy,",
+				"          tempUpdatedOn = source2@UpdatedOn,",
+				"          tempDeletedBy = source2@DeletedBy,",
+				"          tempDeletedOn = source2@DeletedOn,",
+				"          tempRowLockVersion = source2@RowLockVersion,",
+				"          tempIsActive = source2@IsActive",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 filter(EmployeeID == tempEmployeeID && UpdatedOn < tempUpdatedOn) ~> filter1",
+				"source1, select3 union(byName: true)~> union1",
+				"union1 aggregate(groupBy(EmployeeID),",
+				"     each(match(name!='EmployeeID'), $$ = last($$))) ~> aggregate2",
+				"aggregate2 sort(asc(EmployeeID, false)) ~> sort1",
+				"filter1 select(mapColumn(",
+				"          EmployeeID = tempEmployeeID,",
+				"          CashCentreID = tempCashCentreID,",
+				"          CashCentreShiftID = tempCashCentreShiftID,",
+				"          CashCentreTeamID = tempCashCentreTeamID,",
+				"          PayRollNumber = tempPayRollNumber,",
+				"          FirstName = tempFirstName,",
+				"          LastName = tempLastName,",
+				"          DisplayName = tempDisplayName,",
+				"          CreatedBy = tempCreatedBy,",
+				"          CreatedOn = tempCreatedOn,",
+				"          UpdatedBy = tempUpdatedBy,",
+				"          UpdatedOn = tempUpdatedOn,",
+				"          DeletedBy = tempDeletedBy,",
+				"          DeletedOn = tempDeletedOn,",
+				"          RowLockVersion = tempRowLockVersion,",
+				"          IsActive = tempIsActive",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink1"
+			]
+		}
+	}
+}

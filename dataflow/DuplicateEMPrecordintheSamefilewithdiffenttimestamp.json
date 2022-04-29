@@ -1,0 +1,73 @@
+{
+	"name": "DuplicateEMPrecordintheSamefilewithdiffenttimestamp",
+	"properties": {
+		"description": "https://github.com/AzureDataAnalytics/ETL/wiki/Processing-BusinessRules-rules-thru-ADF-on-Insert-Update-Delete\nMore details here on Task 2 Duplicate EMP record in the Same file with diffent time stamp",
+		"folder": {
+			"name": "duplidacte re cords dataflows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "sort2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as short,",
+				"          CashCentreID as integer,",
+				"          CashCentreShiftID as integer,",
+				"          CashCentreTeamID as long,",
+				"          PayRollNumber as long,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          CreatedBy as string,",
+				"          CreatedOn as string,",
+				"          UpdatedBy as string,",
+				"          UpdatedOn as string,",
+				"          DeletedBy as string,",
+				"          DeletedOn as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'adf',",
+				"     fileName: 'Employee_Duplicate_UdatedTimestamp_insidefile.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source1",
+				"sort2 aggregate(groupBy(EmployeeID),",
+				"     each(match(name!='EmployeeID'), $$ = last($$))) ~> aggregate1",
+				"source1 sort(asc(UpdatedOn, true)) ~> sort2",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink1"
+			]
+		}
+	}
+}

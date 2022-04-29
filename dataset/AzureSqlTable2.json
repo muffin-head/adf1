@@ -1,0 +1,59 @@
+{
+	"name": "AzureSqlTable2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "empno",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "ename",
+				"type": "nvarchar"
+			},
+			{
+				"name": "job",
+				"type": "nvarchar"
+			},
+			{
+				"name": "mgr",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "hiredate",
+				"type": "date"
+			},
+			{
+				"name": "sal",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "comm",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "deptno",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "grade",
+				"type": "smallint",
+				"precision": 5
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "logs1"
+		}
+	}
+}

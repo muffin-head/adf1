@@ -1,0 +1,467 @@
+{
+	"name": "Json1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService3",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"server": {
+					"type": "object",
+					"properties": {
+						"requests": {
+							"type": "object",
+							"properties": {
+								"Session_Loginrequest": {
+									"type": "object"
+								},
+								"setDocumentRequest": {
+									"type": "object",
+									"properties": {
+										"session": {
+											"type": "object",
+											"properties": {
+												"data": {
+													"type": "object",
+													"properties": {
+														"VehicleQuoteID": {
+															"type": "string"
+														},
+														"TransactionReason": {
+															"type": "string"
+														},
+														"policy": {
+															"type": "object",
+															"properties": {
+																"Aggregator": {
+																	"type": "string"
+																},
+																"RequestDate": {
+																	"type": "string"
+																},
+																"EmailAddress": {
+																	"type": "string"
+																},
+																"InceptionSource": {
+																	"type": "string"
+																},
+																"InceptionScheme": {
+																	"type": "string"
+																},
+																"InceptionDate": {
+																	"type": "string"
+																},
+																"CampaignCode": {
+																	"type": "string"
+																},
+																"DiscountCode": {
+																	"type": "string"
+																},
+																"CorrectionAdjustmentCategory": {
+																	"type": "string"
+																},
+																"CorrectionAdjustmentSubCategory": {
+																	"type": "string"
+																},
+																"Cover": {
+																	"type": "object",
+																	"properties": {
+																		"CoverDate": {
+																			"type": "string"
+																		},
+																		"CoverType": {
+																			"type": "array",
+																			"items": {
+																				"type": "string"
+																			}
+																		},
+																		"CoverKind": {
+																			"type": "string"
+																		},
+																		"voluntaryexcess": {
+																			"type": "string"
+																		},
+																		"insurance": {
+																			"type": "string"
+																		}
+																	}
+																},
+																"drivers": {
+																	"type": "object",
+																	"properties": {
+																		"driver": {
+																			"type": "array",
+																			"items": {
+																				"type": "object",
+																				"properties": {
+																					"DriverNumber": {
+																						"type": "string"
+																					},
+																					"Gender": {
+																						"type": "string"
+																					},
+																					"FirstName": {
+																						"type": "string"
+																					},
+																					"Surname": {
+																						"type": "string"
+																					},
+																					"DateOfBirth": {
+																						"type": "string"
+																					},
+																					"ResidenceDate": {
+																						"type": "string"
+																					},
+																					"RelationshipToProposer": {
+																						"type": "string"
+																					},
+																					"MaritalStatus": {
+																						"type": "string"
+																					},
+																					"licence": {
+																						"type": "object",
+																						"properties": {
+																							"LicenceDate": {
+																								"type": "string"
+																							},
+																							"LicenceType": {
+																								"type": "string"
+																							},
+																							"PetOwner": {
+																								"type": "string"
+																							},
+																							"DrivingLicenceNumberKnown": {
+																								"type": "string"
+																							},
+																							"DrivingLicenceNumber": {
+																								"type": "string"
+																							}
+																						}
+																					},
+																					"occupation": {
+																						"type": "object",
+																						"properties": {
+																							"Business": {
+																								"type": "string"
+																							},
+																							"EmploymentStatus": {
+																								"type": "string"
+																							},
+																							"OccupationType": {
+																								"type": "string"
+																							}
+																						}
+																					},
+																					"Address": {
+																						"type": "object",
+																						"properties": {
+																							"HouseName": {
+																								"type": "string"
+																							},
+																							"HouseNumber": {
+																								"type": "string"
+																							},
+																							"postcode": {
+																								"type": "string"
+																							}
+																						}
+																					},
+																					"Contact": {
+																						"type": "object",
+																						"properties": {
+																							"Email": {
+																								"type": "string"
+																							},
+																							"mobile": {
+																								"type": "string"
+																							}
+																						}
+																					},
+																					"household": {
+																						"type": "object",
+																						"properties": {
+																							"NumberOfCar": {
+																								"type": "string"
+																							},
+																							"NumberOfChildren": {
+																								"type": "string"
+																							},
+																							"HomeOwner": {
+																								"type": "string"
+																							}
+																						}
+																					},
+																					"Claims": {
+																						"type": "object",
+																						"properties": {
+																							"Claims": {
+																								"type": "string"
+																							},
+																							"ClaimsDetails": {
+																								"type": "string"
+																							},
+																							"Nonmotoring": {
+																								"type": "string"
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																},
+																"vehicle": {
+																	"type": "object",
+																	"properties": {
+																		"AnnualBusinessMileage": {
+																			"type": "string"
+																		},
+																		"Registration": {
+																			"type": "string"
+																		},
+																		"Manufacturer": {
+																			"type": "string"
+																		},
+																		"Model": {
+																			"type": "string"
+																		},
+																		"Body": {
+																			"type": "string"
+																		},
+																		"Year": {
+																			"type": "integer"
+																		},
+																		"Transmission": {
+																			"type": "string"
+																		},
+																		"Fuel": {
+																			"type": "string"
+																		},
+																		"Engine": {
+																			"type": "string"
+																		},
+																		"PurchasedDate": {
+																			"type": "string"
+																		},
+																		"DriveSide": {
+																			"type": "string"
+																		},
+																		"LocationKept": {
+																			"type": "string"
+																		},
+																		"VehicleKeptDayLocation": {
+																			"type": "string"
+																		},
+																		"AnnualPleasureMileage": {
+																			"type": "string"
+																		},
+																		"About": {
+																			"type": "object",
+																			"properties": {
+																				"Value": {
+																					"type": "string"
+																				},
+																				"imported": {
+																					"type": "string"
+																				},
+																				"LORRDrive": {
+																					"type": "string"
+																				},
+																				"immobiliser": {
+																					"type": "string"
+																				},
+																				"tracker": {
+																					"type": "string"
+																				},
+																				"modifications": {
+																					"type": "string"
+																				},
+																				"Dashcam": {
+																					"type": "string"
+																				},
+																				"NumberOfSeats": {
+																					"type": "string"
+																				}
+																			}
+																		},
+																		"ownership": {
+																			"type": "object",
+																			"properties": {
+																				"ManufacturedDate": {
+																					"type": "string"
+																				},
+																				"buy": {
+																					"type": "string"
+																				},
+																				"RegisteredOwner": {
+																					"type": "string"
+																				},
+																				"RegisteredKeeper": {
+																					"type": "string"
+																				},
+																				"RegisteredQPlate": {
+																					"type": "string"
+																				}
+																			}
+																		},
+																		"ABICode": {
+																			"type": "string"
+																		},
+																		"securitydevice": {
+																			"type": "object",
+																			"properties": {
+																				"Fitter": {
+																					"type": "string"
+																				},
+																				"Type": {
+																					"type": "string"
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														},
+														"@index": {
+															"type": "string"
+														},
+														"@description": {
+															"type": "string"
+														},
+														"Flags": {
+															"type": "null"
+														},
+														"Quotes": {
+															"type": "object",
+															"properties": {
+																"Quote": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"No": {
+																				"type": "string"
+																			},
+																			"SessionId": {
+																				"type": "string"
+																			},
+																			"ComparedSessionId": {
+																				"type": "string"
+																			},
+																			"QuoteDate": {
+																				"type": "string"
+																			},
+																			"TransactionType": {
+																				"type": "string"
+																			},
+																			"QuoteStatus": {
+																				"type": "string"
+																			},
+																			"HistoryStatus": {
+																				"type": "string"
+																			},
+																			"Price": {
+																				"type": "string"
+																			},
+																			"Differences": {
+																				"type": "object",
+																				"properties": {
+																					"VoluntaryExcess": {
+																						"type": "object",
+																						"properties": {
+																							"New": {
+																								"type": "string"
+																							},
+																							"Old": {
+																								"type": "string"
+																							}
+																						}
+																					}
+																				}
+																			},
+																			"usage": {
+																				"type": "object",
+																				"properties": {
+																					"use": {
+																						"type": "string"
+																					},
+																					"mileage": {
+																						"type": "string"
+																					},
+																					"kept": {
+																						"type": "object",
+																						"properties": {
+																							"day": {
+																								"type": "string"
+																							},
+																							"overnight": {
+																								"type": "string"
+																							},
+																							"location": {
+																								"type": "string"
+																							}
+																						}
+																					},
+																					"bonus": {
+																						"type": "object",
+																						"properties": {
+																							"NCB": {
+																								"type": "string"
+																							},
+																							"other": {
+																								"type": "string"
+																							}
+																						}
+																					}
+																				}
+																			},
+																			"Termsimposed": {
+																				"type": "string"
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												},
+												"AdditionalData": {
+													"type": "object",
+													"properties": {
+														"KeyValuePair": {
+															"type": "array",
+															"items": {
+																"type": "object",
+																"properties": {
+																	"Key": {
+																		"type": "string"
+																	},
+																	"Value": {
+																		"type": "string"
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

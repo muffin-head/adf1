@@ -1,0 +1,201 @@
+{
+	"name": "CashcenterHashingNewData",
+	"properties": {
+		"folder": {
+			"name": "RegionCashcenterHashingSQL"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "RegionHash"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "cashCentertypeHash"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "cashcenter"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourcecashCenterhashStaging"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkupdateCashcenter"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkInsertCashcenter"
+				}
+			],
+			"transformations": [
+				{
+					"name": "validatecashcenterTYPE"
+				},
+				{
+					"name": "validatingRegion"
+				},
+				{
+					"name": "derivedHashValue"
+				},
+				{
+					"name": "NotexistsSha"
+				},
+				{
+					"name": "exists4"
+				},
+				{
+					"name": "Update"
+				},
+				{
+					"name": "Insert"
+				},
+				{
+					"name": "exists5"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          RegionID as short,",
+				"          RegionCode as short,",
+				"          RegionDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean,",
+				"          sha as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingRegion',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> RegionHash",
+				"source(output(",
+				"          CashCentreTypeID as short,",
+				"          CashCentreTypeCode as integer,",
+				"          CashCentreTypeDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean,",
+				"          sha as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingCashcenterType',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> cashCentertypeHash",
+				"source(output(",
+				"          CashCentreID as integer,",
+				"          {  CashCentreTypeID} as short,",
+				"          { RegionID} as short,",
+				"          CashCentreCode as integer,",
+				"          CashCentreDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'test1.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> cashcenter",
+				"source(output(",
+				"          CashCentreID as integer,",
+				"          {  CashCentreTypeID} as short,",
+				"          { RegionID} as short,",
+				"          CashCentreCode as integer,",
+				"          CashCentreDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean,",
+				"          CashCentreTypeID as short,",
+				"          CashCentreTypeCode as integer,",
+				"          CashCentreTypeDescription as string,",
+				"          sha as string,",
+				"          RegionID as short,",
+				"          RegionCode as short,",
+				"          RegionDescription as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'cashcenterHashing',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> sourcecashCenterhashStaging",
+				"cashcenter, cashCentertypeHash join({  CashCentreTypeID} == CashCentreTypeID,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> validatecashcenterTYPE",
+				"validatecashcenterTYPE, RegionHash join({ RegionID} == RegionID,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> validatingRegion",
+				"validatingRegion derive(sha = sha1(CashCentreID,{  CashCentreTypeID},CashCentreCode,CashCentreDescription),",
+				"          shaID = sha1(CashCentreID)) ~> derivedHashValue",
+				"derivedHashValue, sourcecashCenterhashStaging exists(derivedHashValue@sha == sourcecashCenterhashStaging@sha,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> NotexistsSha",
+				"NotexistsSha, sourcecashCenterhashStaging exists(cashcenter@CashCentreID == sourcecashCenterhashStaging@CashCentreID,",
+				"     negate:false,",
+				"     broadcast: 'auto')~> exists4",
+				"exists4 alterRow(updateIf(true())) ~> Update",
+				"exists5 alterRow(insertIf(true())) ~> Insert",
+				"NotexistsSha, sourcecashCenterhashStaging exists(cashcenter@CashCentreID == sourcecashCenterhashStaging@CashCentreID,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists5",
+				"Update sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'cashcenterHashing',",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['CashCentreID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkupdateCashcenter",
+				"Insert sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'cashcenterHashing',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkInsertCashcenter"
+			]
+		}
+	}
+}

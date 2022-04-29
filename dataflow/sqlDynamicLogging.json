@@ -1,0 +1,118 @@
+{
+	"name": "sqlDynamicLogging",
+	"properties": {
+		"folder": {
+			"name": "Dynamic Folder Logging and fetching"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "DataToBeManipulated"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "ErrorTable"
+				},
+				{
+					"name": "Temp"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "FinalDataAfterRemoval"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split1"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     parameter1 as string",
+				"}",
+				"source(output(",
+				"          EmployeeID as string,",
+				"          CashCentreID as string,",
+				"          CashCentreShiftID as string,",
+				"          CashCentreTeamID as string,",
+				"          PayRollNumber as string,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          CreatedBy as string,",
+				"          CreatedOn as string,",
+				"          UpdatedBy as string,",
+				"          DeletedBy as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as string,",
+				"          Mobilenumber as string,",
+				"          {Address } as string,",
+				"          {start date} as string,",
+				"          {end date} as string,",
+				"          validate as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: ($parameter1),",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> DataToBeManipulated",
+				"DataToBeManipulated split(between(toDate({start date}),currentDate()-9125,currentDate()+15),",
+				"     disjoint: false) ~> split1@(validate, notValidate)",
+				"split1@notValidate alterRow(deleteIf(validate==false())) ~> alterRow1",
+				"split1@notValidate sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: (concat($parameter1,'error')),",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> ErrorTable",
+				"split1@validate sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> Temp",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: ($parameter1),",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     deletable: true,",
+				"     upsertable: false,",
+				"     keys:['EmployeeID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> FinalDataAfterRemoval"
+			]
+		}
+	}
+}

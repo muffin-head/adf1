@@ -1,0 +1,135 @@
+{
+	"name": "dynamicDatathroughpipelneWorking",
+	"properties": {
+		"folder": {
+			"name": "TanmayTest"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Excel1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "flowlet1",
+					"flowlet": {
+						"referenceName": "startDateEndDate1",
+						"type": "DataFlowReference"
+					}
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     parameter1 as string,",
+				"     parameter2 as string,",
+				"     parameter3 as string ('Sheet1')",
+				"}",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     wildcardPaths:[($parameter1)]) ~> source1",
+				"source1 derive(sourcename = $parameter1,",
+				"          ruleName = 'Column Count') ~> derivedColumn3",
+				"derivedColumn3 split(isNull(columnNames()[8]),",
+				"     disjoint: false) ~> split1@(badColCount, goodCol)",
+				"split1@goodCol derive(EmployeeID = toShort(byName('EmployeeID')),",
+				"          CashCentreID = toInteger(byName('CashCentreID')),",
+				"          CashCentreShiftID = toInteger(byName('CashCentreShiftID')),",
+				"          CashCentreTeamID = toLong(byName('CashCentreTeamID')),",
+				"          PayRollNumber = toLong(byName('PayRollNumber')),",
+				"          FirstName = toString(byName('FirstName')),",
+				"          LastName = toString(byName('LastName')),",
+				"          DisplayName = toString(byName('DisplayName')),",
+				"          CreatedBy = toString(byName('CreatedBy')),",
+				"          CreatedOn = toDate(byName('CreatedOn')),",
+				"          UpdatedBy = toString(byName('UpdatedBy')),",
+				"          DeletedBy = toString(byName('DeletedBy')),",
+				"          RowLockVersion = toString(byName('UpdaRowLockVersiontedBy')),",
+				"          IsActive = toBoolean(byName('IsActive')),",
+				"          Mobilenumber = toLong(byName('Mobilenumber')),",
+				"          Address = toString(byName('Address')),",
+				"          {start date} = toDate(byName('start date')),",
+				"          {end date} = toDate(byName('end date'))) ~> derivedColumn4",
+				"derivedColumn4 compose(mapColumn(",
+				"          date = {start date},",
+				"          empid = EmployeeID,",
+				"          CashCentreID,",
+				"          CashCentreShiftID,",
+				"          CashCentreTeamID,",
+				"          PayRollNumber,",
+				"          FirstName,",
+				"          LastName,",
+				"          DisplayName,",
+				"          CreatedBy,",
+				"          CreatedOn,",
+				"          UpdatedBy,",
+				"          DeletedBy,",
+				"          RowLockVersion,",
+				"          IsActive,",
+				"          Mobilenumber,",
+				"          Address,",
+				"          {end date}",
+				"     ),",
+				"     composition: 'startDateEndDate1') ~> flowlet1@(output1)",
+				"split1@badColCount sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: ($parameter2),",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+				"flowlet1@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: ($parameter2),",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
+			]
+		}
+	}
+}

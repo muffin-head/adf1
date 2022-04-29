@@ -1,0 +1,74 @@
+{
+	"name": "dataflow2",
+	"properties": {
+		"folder": {
+			"name": "TanmayTest"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as short,",
+				"          CashCentreID as integer,",
+				"          CashCentreShiftID as integer,",
+				"          CashCentreTeamID as long,",
+				"          PayRollNumber as long,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          CreatedBy as string,",
+				"          CreatedOn as date,",
+				"          UpdatedBy as string,",
+				"          DeletedBy as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as boolean,",
+				"          Mobilenumber as long,",
+				"          {Address } as string,",
+				"          {joined date} as string,",
+				"          {end date} as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'lookup (2).xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source1",
+				"source1 derive({joined date validation} = between(toDate({joined date}), currentDate() -1000, currentDate() + 20)) ~> derivedColumn1",
+				"derivedColumn1 aggregate(groupBy(EmployeeID),",
+				"     {joined date validation} = true()) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink1"
+			]
+		}
+	}
+}

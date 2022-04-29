@@ -1,0 +1,77 @@
+{
+	"name": "SQLmanipulationinADFDelete",
+	"properties": {
+		"folder": {
+			"name": "SQLmanipulationinADFInsertUpdateDeleteUpSert"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "AzureBlobStorage4",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "select3"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          FeedItemID as short,",
+				"          FeedFileName as string,",
+				"          FeedNotes as string,",
+				"          FeedItemType as string,",
+				"          Startdate as date,",
+				"          EndDate as date,",
+				"          Rows_processed as short,",
+				"          Rows_rejected as short,",
+				"          FeedStatus as string,",
+				"          Comments as string,",
+				"          Functions as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'adf',",
+				"     fileName: 'dbo.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source1",
+				"source1 alterRow(deleteIf(Rows_rejected<20)) ~> alterRow1",
+				"alterRow1 select(skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'logs',",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     deletable: true,",
+				"     upsertable: false,",
+				"     keys:['FeedItemID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

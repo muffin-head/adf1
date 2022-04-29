@@ -1,0 +1,68 @@
+{
+	"name": "DelimitedText3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "dbo.xlsx.txt",
+				"fileSystem": "olist"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "1001",
+				"type": "String"
+			},
+			{
+				"name": "emp",
+				"type": "String"
+			},
+			{
+				"name": "emp data",
+				"type": "String"
+			},
+			{
+				"name": "daily",
+				"type": "String"
+			},
+			{
+				"name": "2021/02/02",
+				"type": "String"
+			},
+			{
+				"name": "2021/03/19",
+				"type": "String"
+			},
+			{
+				"name": "125",
+				"type": "String"
+			},
+			{
+				"name": "26",
+				"type": "String"
+			},
+			{
+				"name": "Started",
+				"type": "String"
+			},
+			{
+				"name": "calling API ",
+				"type": "String"
+			},
+			{
+				"name": "0",
+				"type": "String"
+			}
+		]
+	}
+}

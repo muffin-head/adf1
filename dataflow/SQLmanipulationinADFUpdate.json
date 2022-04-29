@@ -1,0 +1,80 @@
+{
+	"name": "SQLmanipulationinADFUpdate",
+	"properties": {
+		"folder": {
+			"name": "SQLmanipulationinADFInsertUpdateDeleteUpSert"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select3"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "AlterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          FeedItemID as integer,",
+				"          FeedFileName as string,",
+				"          FeedNotes as string,",
+				"          FeedItemType as string,",
+				"          Startdate as date,",
+				"          EndDate as date,",
+				"          Rows_processed as integer,",
+				"          Rows_rejected as integer,",
+				"          FeedStatus as string,",
+				"          Comments as string,",
+				"          Functions as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'logs',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> source1",
+				"derivedColumn1 select(skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"source1 derive(FeedStatus = regexReplace(FeedStatus,'Started','Completed')) ~> derivedColumn1",
+				"select3 alterRow(updateIf(true())) ~> AlterRow1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'logs',",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['FeedItemID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

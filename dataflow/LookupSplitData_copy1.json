@@ -1,0 +1,237 @@
+{
+	"name": "LookupSplitData_copy1",
+	"properties": {
+		"description": "Splitting the data and storing it in the sql db",
+		"folder": {
+			"name": "TanmayTest"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink2"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink3"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink4"
+				}
+			],
+			"transformations": [
+				{
+					"name": "LookupKey"
+				},
+				{
+					"name": "SplitDataNumber"
+				},
+				{
+					"name": "SplitDataAddress"
+				},
+				{
+					"name": "SplitDataName"
+				},
+				{
+					"name": "SplitDataEmp"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "RegexName"
+				},
+				{
+					"name": "RegexNumber"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "AlterRow2"
+				},
+				{
+					"name": "AlterRow3"
+				},
+				{
+					"name": "AlterRow4"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as short,",
+				"          CashCentreID as integer,",
+				"          CashCentreShiftID as integer,",
+				"          CashCentreTeamID as long,",
+				"          PayRollNumber as long,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          CreatedBy as string,",
+				"          CreatedOn as date,",
+				"          UpdatedBy as string,",
+				"          DeletedBy as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as boolean,",
+				"          Mobilenumber as long,",
+				"          {Address } as string,",
+				"          {joined date} as date,",
+				"          {end date} as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'adf',",
+				"     fileName: 'lookup.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source1",
+				"source1 keyGenerate(output(NameLookupkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> LookupKey",
+				"LookupKey select(mapColumn(",
+				"          NameLookupkey,",
+				"          Mobilenumber",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SplitDataNumber",
+				"LookupKey select(mapColumn(",
+				"          NameLookupkey,",
+				"          {Address }",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SplitDataAddress",
+				"LookupKey select(mapColumn(",
+				"          NameLookupkey,",
+				"          FirstName,",
+				"          LastName,",
+				"          DisplayName",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SplitDataName",
+				"LookupKey select(mapColumn(",
+				"          EmployeeID,",
+				"          CashCentreID,",
+				"          CashCentreShiftID,",
+				"          CashCentreTeamID,",
+				"          PayRollNumber,",
+				"          CreatedBy,",
+				"          UpdatedBy,",
+				"          DeletedBy,",
+				"          RowLockVersion,",
+				"          IsActive,",
+				"          {joined date},",
+				"          {end date},",
+				"          NameLookupkey",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SplitDataEmp",
+				"SplitDataEmp derive(updatedOn = currentTimestamp(),",
+				"          validate_date = between({joined date},currentDate()-9125,currentDate()+15)) ~> derivedColumn1",
+				"SplitDataName derive(updatedOn = currentTimestamp()) ~> derivedColumn2",
+				"SplitDataNumber derive(updatedOn = currentTimestamp()) ~> derivedColumn3",
+				"SplitDataAddress derive(updatedOn = currentTimestamp()) ~> derivedColumn4",
+				"derivedColumn2 derive(FirstName = regexReplace(FirstName, '!@#$%^&*',''),",
+				"          LastName = regexReplace(FirstName, '!@#$%^&*',''),",
+				"          DisplayName = regexReplace(FirstName, '!@#$%^&*','')) ~> RegexName",
+				"derivedColumn3 derive(Mobilenumber = case(length(toString(Mobilenumber))==10,Mobilenumber,toLong(0))) ~> RegexNumber",
+				"derivedColumn1 alterRow(upsertIf(true())) ~> AlterRow1",
+				"RegexName alterRow(upsertIf(true())) ~> AlterRow2",
+				"RegexNumber alterRow(upsertIf(true())) ~> AlterRow3",
+				"derivedColumn4 alterRow(upsertIf(true())) ~> AlterRow4",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'emp',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['NameLookupkey'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+				"AlterRow2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'name',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['NameLookupkey'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink2",
+				"AlterRow3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'mobile',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['NameLookupkey'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink3",
+				"AlterRow4 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'address',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['NameLookupkey'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink4"
+			]
+		}
+	}
+}

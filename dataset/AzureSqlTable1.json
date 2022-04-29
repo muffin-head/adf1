@@ -1,0 +1,65 @@
+{
+	"name": "AzureSqlTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "FeedItemID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "FeedFileName",
+				"type": "varchar"
+			},
+			{
+				"name": "FeedNotes",
+				"type": "varchar"
+			},
+			{
+				"name": "FeedItemType",
+				"type": "varchar"
+			},
+			{
+				"name": "Startdate",
+				"type": "date"
+			},
+			{
+				"name": "EndDate",
+				"type": "date"
+			},
+			{
+				"name": "Rows_processed",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Rows_rejected",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "FeedStatus",
+				"type": "varchar"
+			},
+			{
+				"name": "Comments",
+				"type": "varchar"
+			},
+			{
+				"name": "Functions",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "$parameter1"
+		}
+	}
+}

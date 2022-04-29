@@ -1,0 +1,109 @@
+{
+	"name": "task3a",
+	"properties": {
+		"folder": {
+			"name": "duplidacte re cords dataflows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "union1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "sort1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as short,",
+				"          CashCentreID as integer,",
+				"          CashCentreShiftID as integer,",
+				"          CashCentreTeamID as long,",
+				"          PayRollNumber as long,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          CreatedBy as string,",
+				"          CreatedOn as string,",
+				"          UpdatedBy as string,",
+				"          UpdatedOn as string,",
+				"          DeletedBy as string,",
+				"          DeletedOn as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'adf',",
+				"     fileName: 'emp_duplicate_timestam_inside.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source1",
+				"source(output(",
+				"          EmployeeID as short,",
+				"          CashCentreID as integer,",
+				"          CashCentreShiftID as integer,",
+				"          CashCentreTeamID as long,",
+				"          PayRollNumber as long,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          CreatedBy as string,",
+				"          CreatedOn as string,",
+				"          UpdatedBy as string,",
+				"          UpdatedOn as string,",
+				"          DeletedBy as string,",
+				"          DeletedOn as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'adf',",
+				"     fileName: 'Employee_Incr_DuplicateRecord.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source2",
+				"source1, source2 union(byName: true)~> union1",
+				"union1 aggregate(groupBy(EmployeeID),",
+				"     each(match(name!='EmployeeID'), $$ = last($$))) ~> aggregate1",
+				"aggregate1 sort(asc(EmployeeID, false)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink1"
+			]
+		}
+	}
+}

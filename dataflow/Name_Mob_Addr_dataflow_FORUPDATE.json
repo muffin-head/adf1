@@ -1,0 +1,128 @@
+{
+	"name": "Name_Mob_Addr_dataflow_FORUPDATE",
+	"properties": {
+		"folder": {
+			"name": "Sagar"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "name"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "mobbaddr"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sqlName"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sqlMobAddr"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedUpdatedOn1"
+				},
+				{
+					"name": "DerivedUpdatedOn2"
+				},
+				{
+					"name": "derivedRegex1"
+				},
+				{
+					"name": "derivedRegex2"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "alterRow2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as short,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'name_record.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> name",
+				"source(output(",
+				"          EmployeeID as short,",
+				"          Mobilenumber as long,",
+				"          {Address } as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'mob_add_record.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> mobbaddr",
+				"name derive(updatedOn = currentTimestamp()) ~> DerivedUpdatedOn1",
+				"mobbaddr derive(updatedOn = currentTimestamp()) ~> DerivedUpdatedOn2",
+				"DerivedUpdatedOn1 derive(LastName = regexReplace(LastName, '!@#$%^&*',''),",
+				"          DisplayName = regexReplace(DisplayName, '!@#$%^&*',''),",
+				"          FirstName = regexReplace(FirstName,'SMITH','UPDATED')) ~> derivedRegex1",
+				"DerivedUpdatedOn2 derive(Mobilenumber = case(length(toString(Mobilenumber))==10,Mobilenumber,toLong(0))) ~> derivedRegex2",
+				"derivedRegex1 alterRow(updateIf(true())) ~> alterRow1",
+				"derivedRegex2 alterRow(updateIf(true())) ~> alterRow2",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'name_record',",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['EmployeeID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sqlName",
+				"alterRow2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'mob_add_record',",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['EmployeeID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sqlMobAddr"
+			]
+		}
+	}
+}

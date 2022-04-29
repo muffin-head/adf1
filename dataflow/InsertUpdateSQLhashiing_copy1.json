@@ -1,0 +1,97 @@
+{
+	"name": "InsertUpdateSQLhashiing_copy1",
+	"properties": {
+		"folder": {
+			"name": "TanmayTest"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "newData"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "stagingData"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "alterRow2"
+				},
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CashCentreTypeID as short,",
+				"          CashCentreTypeCode as integer,",
+				"          CashCentreTypeDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'cashcenterupdate.xlsx',",
+				"     sheetName: 'Sheet2',",
+				"     firstRowAsHeader: true) ~> newData",
+				"source(output(",
+				"          CashCentreTypeID as short,",
+				"          CashCentreTypeCode as integer,",
+				"          CashCentreTypeDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean,",
+				"          sha as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingCashcenterType',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> stagingData",
+				"newData derive(sha = sha1(CashCentreTypeID,CashCentreTypeCode,CashCentreTypeDescription,IsActive)) ~> derivedColumn1",
+				"split1@exist alterRow(insertIf(true())) ~> alterRow2",
+				"derivedColumn1 split(ERROR_FUNCTION(''),",
+				"     disjoint: false) ~> split1@(exist, noexist)",
+				"alterRow2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingCashcenterType',",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['CashCentreTypeID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
+			]
+		}
+	}
+}

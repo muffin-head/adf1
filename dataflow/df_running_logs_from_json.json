@@ -1,0 +1,63 @@
+{
+	"name": "df_running_logs_from_json",
+	"properties": {
+		"description": "Storiing the logs from the json output to the sql database",
+		"folder": {
+			"name": "logsForCopyActivityANDDataflow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText5",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          DataFactory_Name as string,",
+				"          Pipeline_Name as string,",
+				"          RunId as string,",
+				"          Source as string,",
+				"          Destination as string,",
+				"          EventType as boolean,",
+				"          Category as short,",
+				"          Execution_Status as string,",
+				"          start as string,",
+				"          ErrorDescriprion as string,",
+				"          ErrorLoggedTime as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'ONELOGSTABLECopyActivty',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

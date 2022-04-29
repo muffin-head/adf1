@@ -1,0 +1,9 @@
+{
+	"name": "prod2509",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "8e6264d7-1feb-4923-88b7-75a43490f87c",
+		"tenantId": "bbb16e7e-8a43-4199-b76c-9741348a7707"
+	}
+}

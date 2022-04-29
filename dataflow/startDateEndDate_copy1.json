@@ -1,0 +1,85 @@
+{
+	"name": "startDateEndDate_copy1",
+	"properties": {
+		"folder": {
+			"name": "Sagar"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     file as string ('a.xlsx'),",
+				"     sheet as string ('Sheet1'),",
+				"     sink as string,",
+				"     parameter1 as string[] (['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r'])",
+				"}",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'dynamicdata',",
+				"     fileName: ($file),",
+				"     sheetName: ($sheet),",
+				"     firstRowAsHeader: true) ~> source1",
+				"source1 select(mapColumn(",
+				"          EmployeeID,",
+				"          CashCentreID,",
+				"          CashCentreShiftID,",
+				"          CashCentreTeamID,",
+				"          PayRollNumber,",
+				"          FirstName,",
+				"          LastName,",
+				"          DisplayName,",
+				"          CreatedBy,",
+				"          CreatedOn,",
+				"          UpdatedBy,",
+				"          DeletedBy,",
+				"          RowLockVersion,",
+				"          IsActive,",
+				"          Mobilenumber,",
+				"          {Address },",
+				"          {start date},",
+				"          {end date}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: ($sink),",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,68 @@
+{
+	"name": "DelimitedText15",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService3",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "dataflow_success.csv",
+				"container": "brazil"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "DataFactory_Name",
+				"type": "String"
+			},
+			{
+				"name": "Pipeline_Name",
+				"type": "String"
+			},
+			{
+				"name": "RunId",
+				"type": "String"
+			},
+			{
+				"name": "datafactoryname",
+				"type": "String"
+			},
+			{
+				"name": "TriggerTime",
+				"type": "String"
+			},
+			{
+				"name": "TriggerId",
+				"type": "String"
+			},
+			{
+				"name": "Source",
+				"type": "String"
+			},
+			{
+				"name": "Destination",
+				"type": "String"
+			},
+			{
+				"name": "metrics",
+				"type": "String"
+			},
+			{
+				"name": "profile",
+				"type": "String"
+			},
+			{
+				"name": "ErrorLoggedTime",
+				"type": "String"
+			}
+		]
+	}
+}

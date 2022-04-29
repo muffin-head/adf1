@@ -1,0 +1,135 @@
+{
+	"name": "EmpRecord_dataflow",
+	"properties": {
+		"folder": {
+			"name": "Sagar"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "emp"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "mobAddRecordSQL"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "nameRecordSQL"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sqlemp"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DeriveUpdatedON"
+				},
+				{
+					"name": "checkingIfFRecordExist"
+				},
+				{
+					"name": "InsertingDatatoSQLtable"
+				},
+				{
+					"name": "JoiningMobAddrANDName"
+				},
+				{
+					"name": "RemoveDuplicateColumn"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as short,",
+				"          CashCentreID as integer,",
+				"          CashCentreShiftID as integer,",
+				"          CashCentreTeamID as long,",
+				"          PayRollNumber as long,",
+				"          CreatedBy as string,",
+				"          CreatedOn as date,",
+				"          UpdatedBy as string,",
+				"          DeletedBy as string,",
+				"          RowLockVersion as string,",
+				"          IsActive as boolean,",
+				"          {joined date} as date,",
+				"          {end date} as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'emp_record.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> emp",
+				"source(output(",
+				"          EmployeeID as short,",
+				"          Mobilenumber as long,",
+				"          {Address } as string,",
+				"          updatedOn as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'mob_add_record',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> mobAddRecordSQL",
+				"source(output(",
+				"          EmployeeID as short,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DisplayName as string,",
+				"          updatedOn as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'name_record',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> nameRecordSQL",
+				"emp derive(updatedOn = currentTimestamp()) ~> DeriveUpdatedON",
+				"DeriveUpdatedON, RemoveDuplicateColumn exists(emp@EmployeeID == RemoveDuplicateColumn@EmployeeID,",
+				"     negate:false,",
+				"     broadcast: 'auto')~> checkingIfFRecordExist",
+				"checkingIfFRecordExist alterRow(insertIf(true())) ~> InsertingDatatoSQLtable",
+				"nameRecordSQL, mobAddRecordSQL join(nameRecordSQL@EmployeeID == mobAddRecordSQL@EmployeeID,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> JoiningMobAddrANDName",
+				"JoiningMobAddrANDName select(skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> RemoveDuplicateColumn",
+				"InsertingDatatoSQLtable sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'emp_record',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sqlemp"
+			]
+		}
+	}
+}

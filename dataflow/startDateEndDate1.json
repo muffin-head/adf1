@@ -1,0 +1,34 @@
+{
+	"name": "startDateEndDate1",
+	"properties": {
+		"folder": {
+			"name": "TanmayTest"
+		},
+		"type": "Flowlet",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "validateDate"
+				},
+				{
+					"name": "input1"
+				},
+				{
+					"name": "output1"
+				}
+			],
+			"scriptLines": [
+				"input(output(",
+				"          {start date} as date,",
+				"          EmployeeID as short,",
+				"          endDate as date",
+				"     ),",
+				"     order: 0) ~> input1",
+				"input1 derive(validate = between({start date},currentDate()-9125,currentDate()+15)) ~> validateDate",
+				"validateDate output() ~> output1"
+			]
+		}
+	}
+}

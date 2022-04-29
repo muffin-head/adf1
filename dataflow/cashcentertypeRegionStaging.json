@@ -1,0 +1,112 @@
+{
+	"name": "cashcentertypeRegionStaging",
+	"properties": {
+		"folder": {
+			"name": "RegionCashcenterHashingSQL"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "cashcenterType"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "region"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sqlStagingCashcenterType"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sqlStagingRegion"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumnSHAcashcentertype"
+				},
+				{
+					"name": "derivedColumnSHAregion"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CashCentreTypeID as short,",
+				"          CashCentreTypeCode as integer,",
+				"          CashCentreTypeDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'cashcenter.xlsx',",
+				"     sheetName: 'Sheet2',",
+				"     firstRowAsHeader: true) ~> cashcenterType",
+				"source(output(",
+				"          RegionID as short,",
+				"          RegionCode as short,",
+				"          RegionDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'cashcenter.xlsx',",
+				"     sheetName: 'Sheet3',",
+				"     firstRowAsHeader: true) ~> region",
+				"cashcenterType derive(sha = sha1(CashCentreTypeID,CashCentreTypeCode,CashCentreTypeDescription,IsActive)) ~> derivedColumnSHAcashcentertype",
+				"region derive(sha = sha1(RegionID,RegionCode,RegionDescription,IsActive)) ~> derivedColumnSHAregion",
+				"derivedColumnSHAcashcentertype sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingCashcenterType',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sqlStagingCashcenterType",
+				"derivedColumnSHAregion sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingRegion',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sqlStagingRegion"
+			]
+		}
+	}
+}

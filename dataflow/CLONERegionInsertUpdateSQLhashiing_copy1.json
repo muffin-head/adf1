@@ -1,0 +1,160 @@
+{
+	"name": "CLONERegionInsertUpdateSQLhashiing_copy1",
+	"properties": {
+		"folder": {
+			"name": "RegionCashcenterHashingSQL"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService3",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceRegion"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "stagingData"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink2"
+				},
+				{
+					"name": "sink3"
+				}
+			],
+			"transformations": [
+				{
+					"name": "generateHASH"
+				},
+				{
+					"name": "dosentexists"
+				},
+				{
+					"name": "insert"
+				},
+				{
+					"name": "alterRow2"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "exists1"
+				},
+				{
+					"name": "exists2"
+				},
+				{
+					"name": "alterRow3"
+				},
+				{
+					"name": "exists3"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          RegionID as short,",
+				"          RegionCode as short,",
+				"          RegionDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'data',",
+				"     fileName: 'cashcenterupdate.xlsx',",
+				"     sheetName: 'Sheet3',",
+				"     firstRowAsHeader: true) ~> sourceRegion",
+				"source(output(",
+				"          RegionID as short,",
+				"          RegionCode as short,",
+				"          RegionDescription as string,",
+				"          RowLockVersion as short,",
+				"          IsActive as boolean,",
+				"          sha as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingRegion',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> stagingData",
+				"sourceRegion derive(sha = sha1(RegionID,RegionCode,RegionDescription,IsActive),",
+				"          shaID = sha1(RegionID)) ~> generateHASH",
+				"generateHASH, stagingData exists(generateHASH@sha == stagingData@sha,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> dosentexists",
+				"exists1 alterRow(insertIf(true())) ~> insert",
+				"exists3 alterRow(updateIf(true())) ~> alterRow2",
+				"stagingData derive(shaID = sha1(RegionID)) ~> derivedColumn1",
+				"dosentexists, derivedColumn1 exists(generateHASH@shaID == derivedColumn1@shaID,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists1",
+				"dosentexists, derivedColumn1 exists(generateHASH@shaID == derivedColumn1@shaID,",
+				"     negate:false,",
+				"     broadcast: 'auto')~> exists2",
+				"exists2 alterRow(updateIf(true())) ~> alterRow3",
+				"generateHASH, stagingData exists(generateHASH@sha == stagingData@sha,",
+				"     negate:false,",
+				"     broadcast: 'auto')~> exists3",
+				"alterRow3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingRegion',",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['RegionID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+				"insert sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'sqlStagingRegion',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink2",
+				"alterRow2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink3"
+			]
+		}
+	}
+}

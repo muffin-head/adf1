@@ -1,0 +1,33 @@
+{
+	"name": "flowlet1",
+	"properties": {
+		"folder": {
+			"name": "RegionCashcenterHashingSQL"
+		},
+		"type": "Flowlet",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "input1"
+				},
+				{
+					"name": "output1"
+				}
+			],
+			"scriptLines": [
+				"input(output(",
+				"          CashCentreTypeID as short",
+				"     ),",
+				"     order: 0) ~> input1",
+				"input1 aggregate(groupBy(CashCentreTypeID),",
+				"     each(match(name!='CashCentreTypeID'), $$ = last($$))) ~> aggregate1",
+				"aggregate1 output() ~> output1"
+			]
+		}
+	}
+}

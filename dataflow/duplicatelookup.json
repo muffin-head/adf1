@@ -1,0 +1,87 @@
+{
+	"name": "duplicatelookup",
+	"properties": {
+		"description": "https://github.com/AzureDataAnalytics/ETL/wiki/Processing-BusinessRules-rules-thru-ADF-on-Insert-Update-Delete\nMore details here on Task 2 Duplicate EMP record in the Same file with diffent time stamp",
+		"folder": {
+			"name": "duplicateRemoval"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "sort2"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "sort3"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          NameLookupkey as long,",
+				"          Mobilenumber as string,",
+				"          updatedOn as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'mobile',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> source1",
+				"sort2 aggregate(groupBy(NameLookupkey),",
+				"     each(match(name!='NameLookupkey'), $$ = last($$))) ~> aggregate1",
+				"source1 sort(asc(updatedOn, false)) ~> sort2",
+				"aggregate1 alterRow(insertIf(true())) ~> alterRow1",
+				"sort3 select(mapColumn(",
+				"          NameLookupkey,",
+				"          Mobilenumber,",
+				"          updatedOn",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"alterRow1 sort(asc(NameLookupkey, false)) ~> sort3",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'unique_number',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

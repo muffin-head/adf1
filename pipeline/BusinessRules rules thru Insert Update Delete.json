@@ -1,0 +1,33 @@
+{
+	"name": "BusinessRules rules thru Insert Update Delete",
+	"properties": {
+		"description": "https://github.com/AzureDataAnalytics/ETL/wiki/Processing-BusinessRules-rules-thru-ADF-on-Insert-Update-Delete  See here for details ",
+		"activities": [
+			{
+				"name": "DuplicateEMPrecordSamefile",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DuplicateEMPrecordSamefile",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": []
+	}
+}

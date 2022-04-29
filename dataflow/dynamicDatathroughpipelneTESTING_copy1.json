@@ -1,0 +1,70 @@
+{
+	"name": "dynamicDatathroughpipelneTESTING_copy1",
+	"properties": {
+		"folder": {
+			"name": "TanmayTest"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Excel1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "derivedColumn6"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     parameter1 as string,",
+				"     parameter2 as string,",
+				"     parameter3 as string ('Sheet1')",
+				"}",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     wildcardPaths:[($parameter1)]) ~> source1",
+				"source1 derive({start date} = toDate(byName('start date')),",
+				"          endDate = toDate(byName('end date')),",
+				"          EmployeeID = toShort(byName('EmployeeID'))) ~> derivedColumn5",
+				"derivedColumn6 alterRow(updateIf(true())) ~> alterRow1",
+				"derivedColumn5 derive({start date} = case(between({start date},currentDate()-9125,currentDate()+15),{start date},toDate('01/01/2000'))) ~> derivedColumn6",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: ($parameter2),",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['EmployeeID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,205 @@
+{
+	"name": "SQLmanipulationinADFInsertUOdateDelete",
+	"properties": {
+		"description": "https://github.com/AzureDataAnalytics/ETL/wiki/SQL-manipulation-in-ADF\nAlter row transformation in mapping data flow",
+		"folder": {
+			"name": "duplidacte re cords dataflows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "AzureBlobStorage4",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "linkedService2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "alterRow2"
+				},
+				{
+					"name": "alterRow3"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "select5"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          FeedItemID as integer,",
+				"          FeedFileName as string,",
+				"          FeedNotes as string,",
+				"          FeedItemType as string,",
+				"          Startdate as date 'yyyy/MM/dd',",
+				"          EndDate as date 'yyyy/MM/dd',",
+				"          Rows_processed as string,",
+				"          Rows_rejected as integer,",
+				"          FeedStatus as string,",
+				"          Comments as string,",
+				"          Functions as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'adf',",
+				"     fileName: 'dbo.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> source1",
+				"source1 alterRow(updateIf(true())) ~> alterRow1",
+				"source1 alterRow(insertIf(true())) ~> alterRow2",
+				"source1 alterRow(deleteIf(Rows_rejected<20)) ~> alterRow3",
+				"alterRow3 select(mapColumn(",
+				"          FeedItemID,",
+				"          FeedFileName,",
+				"          FeedNotes,",
+				"          FeedItemType,",
+				"          Startdate,",
+				"          EndDate,",
+				"          Rows_processed,",
+				"          Rows_rejected,",
+				"          FeedStatus,",
+				"          Comments,",
+				"          Functions",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"alterRow2 select(mapColumn(",
+				"          FeedItemID,",
+				"          FeedFileName,",
+				"          FeedNotes,",
+				"          FeedItemType,",
+				"          Startdate,",
+				"          EndDate,",
+				"          Rows_processed,",
+				"          Rows_rejected,",
+				"          FeedStatus,",
+				"          Comments,",
+				"          Functions",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"alterRow1 select(mapColumn(",
+				"          FeedItemID,",
+				"          FeedFileName,",
+				"          FeedNotes,",
+				"          FeedItemType,",
+				"          Startdate,",
+				"          EndDate,",
+				"          Rows_processed,",
+				"          Rows_rejected,",
+				"          FeedStatus,",
+				"          Comments,",
+				"          Functions",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select1, select2 join(select1@FeedItemID == select2@FeedItemID,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          FeedItemID = select1@FeedItemID,",
+				"          FeedFileName = select1@FeedFileName,",
+				"          FeedNotes = select1@FeedNotes,",
+				"          FeedItemType = select1@FeedItemType,",
+				"          Startdate = select1@Startdate,",
+				"          EndDate = select1@EndDate,",
+				"          Rows_processed = select1@Rows_processed,",
+				"          Rows_rejected = select1@Rows_rejected,",
+				"          FeedStatus = select1@FeedStatus,",
+				"          Comments = select1@Comments,",
+				"          Functions = select1@Functions,",
+				"          FeedItemID = select2@FeedItemID,",
+				"          FeedFileName = select2@FeedFileName,",
+				"          FeedNotes = select2@FeedNotes,",
+				"          FeedItemType = select2@FeedItemType,",
+				"          Startdate = select2@Startdate,",
+				"          EndDate = select2@EndDate,",
+				"          Rows_processed = select2@Rows_processed,",
+				"          Rows_rejected = select2@Rows_rejected,",
+				"          FeedStatus = select2@FeedStatus,",
+				"          Comments = select2@Comments,",
+				"          Functions = select2@Functions",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"select3, select4 join(select3@FeedItemID == select4@FeedItemID,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> join2",
+				"join2 select(mapColumn(",
+				"          FeedItemID = select3@FeedItemID,",
+				"          FeedFileName = select3@FeedFileName,",
+				"          FeedNotes = select3@FeedNotes,",
+				"          FeedItemType = select3@FeedItemType,",
+				"          Startdate = select3@Startdate,",
+				"          EndDate = select3@EndDate,",
+				"          Rows_processed = select3@Rows_processed,",
+				"          Rows_rejected = select3@Rows_rejected,",
+				"          FeedStatus = select3@FeedStatus,",
+				"          Comments = select3@Comments,",
+				"          Functions = select3@Functions,",
+				"          FeedItemID = select4@FeedItemID,",
+				"          FeedFileName = select4@FeedFileName,",
+				"          FeedNotes = select4@FeedNotes,",
+				"          FeedItemType = select4@FeedItemType,",
+				"          Startdate = select4@Startdate,",
+				"          EndDate = select4@EndDate,",
+				"          Rows_processed = select4@Rows_processed,",
+				"          Rows_rejected = select4@Rows_rejected,",
+				"          FeedStatus = select4@FeedStatus,",
+				"          Comments = select4@Comments,",
+				"          Functions = select4@Functions",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"select5 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'logs',",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     deletable: true,",
+				"     upsertable: false,",
+				"     keys:['FeedItemID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
