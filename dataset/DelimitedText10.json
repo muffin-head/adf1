@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "fails.txt",
-				"container": "adf"
+				"fileName": "stagingdatxlsx.xlsx",
+				"container": "data"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
