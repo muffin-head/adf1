@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "stagingdatxlsx.xlsx",
+				"fileName": "sch.csv",
 				"container": "data"
 			},
 			"columnDelimiter": ",",
